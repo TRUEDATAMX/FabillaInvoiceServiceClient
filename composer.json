@@ -1,0 +1,23 @@
+{
+    "name": "tdse/fabillainvoiceserviceclient",
+    "description": "SDK para Invoice Service que utiliza autenticación JWT a través de un servicio externo.",
+    "type": "library",
+    "require": {
+        "php": ">=7.4",
+        "firebase/php-jwt": "^6.0",
+        "tdse/true-auth-sdk-php": "dev-main"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "FabiInvoiceServiceClient\\": "src/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/TRUEDATAMX/true-auth-sdk-php"
+        }
+    ]
+}

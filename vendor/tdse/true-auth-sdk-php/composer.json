@@ -1,0 +1,12 @@
+{
+    "name": "tdse/true-auth-sdk-php",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Tdse\\TrueAuthSdkPhp\\": "src/"
+        }
+    },
+    "require": {
+        "firebase/php-jwt": "^6.11"
+    }
+}
