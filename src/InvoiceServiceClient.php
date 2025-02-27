@@ -1,6 +1,6 @@
 <?php
 
-namespace FabiInvoiceServiceClient;
+namespace FabillaInvoiceServiceClient;
 
 use TrueAuthSDK\TrueAuth;
 

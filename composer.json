@@ -11,7 +11,7 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "FabiInvoiceServiceClient\\": "src/"
+            "FabillaInvoiceServiceClient\\": "src/"
         }
     },
     "repositories": [
