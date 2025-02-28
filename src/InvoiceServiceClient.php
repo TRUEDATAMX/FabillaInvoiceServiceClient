@@ -7,14 +7,14 @@ use TrueAuthSDK\TrueAuth;
 class InvoiceServiceClient
 {
     /**
-     * URL base del servicio de Invoice.
+     * URL base del servicio de Invoice (endpoint externo).
      * 
      * @var string
      */
     private $invoiceEndpoint = "https://o3cfk2o5gd.execute-api.us-west-2.amazonaws.com";
 
     /**
-     * Instancia del autenticador (TrueAuth SDK externo).
+     * Instancia del autenticador (TrueAuth SDK, servicio externo).
      *
      * @var TrueAuth
      */
@@ -23,7 +23,7 @@ class InvoiceServiceClient
     /**
      * Constructor.
      *
-     * @param TrueAuth $trueAuth Instancia del autenticador.
+     * @param TrueAuth $trueAuth Instancia del autenticador, ya configurado para conectarse al servicio externo de autenticación.
      */
     public function __construct(TrueAuth $trueAuth)
     {
@@ -31,24 +31,27 @@ class InvoiceServiceClient
     }
 
     /**
-     * Método para obtener una factura por su ID.
+     * Obtiene una factura dado su ID.
+     *
+     * Para autenticar la petición, se genera un token JWT utilizando el TrueAuth SDK con la audiencia "TrueAPIKeyService".
      *
      * @param string $invoiceId
-     * @return array
-     * @throws \Exception
+     * @return array La respuesta decodificada (normalmente, los datos de la factura)
+     * @throws \Exception Si ocurre algún error en la conexión o al decodificar la respuesta.
      */
     public function getInvoice(string $invoiceId): array
     {
-        // Genera el token usando la audiencia "TrueAPIKeyService"
+        // Se obtiene el token JWT usando el servicio de autenticación externo
         $token = $this->trueAuth->token('TrueAPIKeyService');
 
+        // Construir la URL completa para obtener la factura
         $url = $this->invoiceEndpoint . "/invoice/" . urlencode($invoiceId);
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        // headers for authentification
+        // Se envían las cabeceras de autenticación y el tipo de contenido
         $headers = [
             "Authorization: Bearer " . $token,
             "Content-Type: application/json"
@@ -72,15 +75,17 @@ class InvoiceServiceClient
     }
 
     /**
-     * Método para crear una nueva factura.
+     * Crea una nueva factura.
+     *
+     * Se genera el token JWT para autenticar la petición de creación. Los datos de la factura se envían en formato JSON.
      *
      * @param array $data Datos de la factura a crear.
-     * @return array
-     * @throws \Exception
+     * @return array Respuesta decodificada del servicio de Invoice.
+     * @throws \Exception Si ocurre algún error en la conexión o al decodificar la respuesta.
      */
     public function createInvoice(array $data): array
     {
-        // Genera el token para la autenticación
+        // Se obtiene el token JWT usando el servicio de autenticación externo
         $token = $this->trueAuth->token('TrueAPIKeyService');
 
         $url = $this->invoiceEndpoint . "/invoice";
@@ -91,7 +96,7 @@ class InvoiceServiceClient
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        // Headers for authentification
+        // Cabeceras para la petición: autenticación y contenido JSON
         $headers = [
             "Authorization: Bearer " . $token,
             "Content-Type: application/json",
@@ -116,4 +121,3 @@ class InvoiceServiceClient
         return $decoded;
     }
 }
-
