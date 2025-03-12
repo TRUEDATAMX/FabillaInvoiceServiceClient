@@ -11,18 +11,13 @@ class InvoiceServiceClient
     private $trueAuth;
 
     public function __construct(
-        ?string $invoiceEndpoint = null,
-        ?string $sharedSecret = null,
-        ?string $authEndpoint = null,
-        ?string $serviceName = null,
-        ?string $audience = null
+        string $invoiceEndpoint,
+        string $audience,
+        TrueAuth $trueAuth
     ) {
-        $this->invoiceEndpoint = $invoiceEndpoint ?? "https://o3cfk2o5gd.execute-api.us-west-2.amazonaws.com";
-        $this->audience = $audience ?? "FabillaInvoiceService";
-        $sharedSecret = $sharedSecret ?? "mecorro2";
-        $authEndpoint = $authEndpoint ?? "https://tdse-aphwg4drbmd6g0ev.mexicocentral-01.azurewebsites.net/m2m/auth/";
-        $serviceName = $serviceName ?? "fabilla";
-        $this->trueAuth = new TrueAuth($sharedSecret, $authEndpoint, $serviceName);
+        $this->invoiceEndpoint = $invoiceEndpoint;
+        $this->audience = $audience;
+        $this->trueAuth = $trueAuth;
     }
 
     public function getInvoice(string $invoiceId): array
