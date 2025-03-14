@@ -11,16 +11,13 @@ class InvoiceServiceClient
     private $trueAuth;
 
     /**
-     * Constructor.
-     *
      * Si solo se provee el endpoint, se utilizan valores por defecto:
      * - audiencia: "FabillaInvoiceService"
      * - trueAuth: se instancia usando variables de entorno.
-     *
      * @param string      $invoiceEndpoint URL del servicio de Invoice.
      * @param string|null $audience        Audiencia (opcional). Por defecto: "FabillaInvoiceService".
      * @param TrueAuth|null $trueAuth      Instancia de TrueAuth (opcional). Se crea automáticamente si no se pasa.
-     *
+     * 
      * @throws \Exception Si las variables de entorno necesarias no están configuradas.
      */
     public function __construct(
