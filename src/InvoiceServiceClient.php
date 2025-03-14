@@ -10,14 +10,41 @@ class InvoiceServiceClient
     private $audience;
     private $trueAuth;
 
+    /**
+     * Constructor.
+     *
+     * Si solo se provee el endpoint, se utilizan valores por defecto:
+     * - audiencia: "FabillaInvoiceService"
+     * - trueAuth: se instancia usando variables de entorno.
+     *
+     * @param string      $invoiceEndpoint URL del servicio de Invoice.
+     * @param string|null $audience        Audiencia (opcional). Por defecto: "FabillaInvoiceService".
+     * @param TrueAuth|null $trueAuth      Instancia de TrueAuth (opcional). Se crea automáticamente si no se pasa.
+     *
+     * @throws \Exception Si las variables de entorno necesarias no están configuradas.
+     */
     public function __construct(
         string $invoiceEndpoint,
-        string $audience,
-        TrueAuth $trueAuth
+        ?string $audience = null,
+        ?TrueAuth $trueAuth = null
     ) {
         $this->invoiceEndpoint = $invoiceEndpoint;
-        $this->audience = $audience;
-        $this->trueAuth = $trueAuth;
+        $this->audience = $audience ?? "FabillaInvoiceService";
+
+        if ($trueAuth === null) {
+            $sharedSecret = getenv('FABILLA_SHARED_SECRET');
+            $authEndpoint = getenv('FABILLA_AUTH_ENDPOINT');
+            $serviceName  = getenv('FABILLA_SERVICE_NAME');
+
+            // Validar que las variables necesarias estén configuradas
+            if (!$sharedSecret || !$authEndpoint || !$serviceName) {
+                throw new \Exception("Faltan variables de entorno requeridas para TrueAuth.");
+            }
+
+            $this->trueAuth = new TrueAuth($sharedSecret, $authEndpoint, $serviceName);
+        } else {
+            $this->trueAuth = $trueAuth;
+        }
     }
 
     public function getInvoice(string $invoiceId): array
