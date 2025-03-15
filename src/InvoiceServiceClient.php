@@ -11,33 +11,34 @@ class InvoiceServiceClient
     private $trueAuth;
 
     /**
-     * Si solo se provee el endpoint, se utilizan valores por defecto:
-     * - audiencia: "FabillaInvoiceService"
-     * - trueAuth: se instancia usando variables de entorno.
-     * @param string      $invoiceEndpoint URL del servicio de Invoice.
-     * @param string|null $audience        Audiencia (opcional). Por defecto: "FabillaInvoiceService".
-     * @param TrueAuth|null $trueAuth      Instancia de TrueAuth (opcional). Se crea automáticamente si no se pasa.
-     * 
-     * @throws \Exception Si las variables de entorno necesarias no están configuradas.
+     * Constructor.
+     * Permite instanciar el cliente sin argumentos (constructor default) obteniendo los valores desde variables de entorno,
+     *
+     * @param string|null $invoiceEndpoint URL del servicio de Invoice. Si es null, se obtiene de la variable INVOICE_ENDPOINT.
+     * @param string|null $audience        Audiencia para el token JWT. Por defecto "FabillaInvoiceService".
+     * @param TrueAuth|null $trueAuth        Instancia de TrueAuth. Se crea automáticamente si es null usando las variables TRUE_SHARED_SECRET, TRUE_AUTHENTICATION_ENDPOINT y TRUE_SERVICE_NAME.
+     *
+     * @throws \Exception Si faltan variables de entorno necesarias para crear TrueAuth.
      */
     public function __construct(
-        string $invoiceEndpoint,
+        ?string $invoiceEndpoint = null,
         ?string $audience = null,
         ?TrueAuth $trueAuth = null
     ) {
-        $this->invoiceEndpoint = $invoiceEndpoint;
+        $this->invoiceEndpoint = $invoiceEndpoint ?? getenv('INVOICE_ENDPOINT');
+        if (!$this->invoiceEndpoint) {
+            throw new \Exception("La variable de entorno INVOICE_ENDPOINT no está definida.");
+        }
+        
         $this->audience = $audience ?? "FabillaInvoiceService";
-
+        
         if ($trueAuth === null) {
-            $sharedSecret = getenv('FABILLA_SHARED_SECRET');
-            $authEndpoint = getenv('FABILLA_AUTH_ENDPOINT');
-            $serviceName  = getenv('FABILLA_SERVICE_NAME');
-
-            // Validar que las variables necesarias estén configuradas
+            $sharedSecret = getenv('TRUE_SHARED_SECRET');
+            $authEndpoint = getenv('TRUE_AUTHENTICATION_ENDPOINT');
+            $serviceName  = getenv('TRUE_SERVICE_NAME');
             if (!$sharedSecret || !$authEndpoint || !$serviceName) {
-                throw new \Exception("Faltan variables de entorno requeridas para TrueAuth.");
+                throw new \Exception("Faltan variables de entorno requeridas para TrueAuth (TRUE_SHARED_SECRET, TRUE_AUTHENTICATION_ENDPOINT, TRUE_SERVICE_NAME).");
             }
-
             $this->trueAuth = new TrueAuth($sharedSecret, $authEndpoint, $serviceName);
         } else {
             $this->trueAuth = $trueAuth;
